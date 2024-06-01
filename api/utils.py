@@ -31,7 +31,6 @@ def get_openai_suggestion(prompt: str, style: str, image_url: str):
             ],
             }
         ],
-        max_tokens=300,
         )
 
     return response.choices[0].message.content 
