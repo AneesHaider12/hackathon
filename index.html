@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Assistant Interior Designer</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
   </style>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -18,17 +18,28 @@
       </h1>
     </div>
     <div id="right">
-      <p>Enter any pic of your room and see the magic</p>
-      <div class="wave-group">
+      <p id = 'pid_hide'>Enter any pic of your room and see the magic</p>
+      <div class="wave-group" id="promptGroup">
         <input required="" type="text" class="input" id="promptInput">
         <span class="bar"></span>
         <label class="label">
-          <span class="label-char" style="--index: 0">PROMPT</span>
-          <!-- <span class="label-char" style="--index: 1">R</span>
+          <span class="label-char" style="--index: 0">P</span>
+          <span class="label-char" style="--index: 1">R</span>
           <span class="label-char" style="--index: 2">O</span>
           <span class="label-char" style="--index: 3">M</span>
           <span class="label-char" style="--index: 4">P</span>
-          <span class="label-char" style="--index: 5">T</span> -->
+          <span class="label-char" style="--index: 5">T</span>
+        </label>
+      </div>
+      <div class="wave-group" id="styleGroup">
+        <input required="" type="text" class="input" id="styleInput">
+        <span class="bar"></span>
+        <label class="label">
+          <span class="label-char" style="--index: 0">S</span>
+          <span class="label-char" style="--index: 1">T</span>
+          <span class="label-char" style="--index: 2">Y</span>
+          <span class="label-char" style="--index: 3">L</span>
+          <span class="label-char" style="--index: 4">E</span>
         </label>
       </div>
       <input type="file" id="imageInput" accept="image/*" style="display: none;">
@@ -45,23 +56,25 @@
   </div>
 
   <script>
-    document.getElementById('uploadButton').addEventListener('click', () => {
+    document.getElementById('uploadButton').addEventListener('click', function() {
       document.getElementById('imageInput').click();
     });
 
-    document.getElementById('submitButton').addEventListener('click', () => {
+    document.getElementById('submitButton').addEventListener('click', function() {
       const prompt = document.getElementById('promptInput').value;
+      const style = document.getElementById('styleInput').value;
       const imageInput = document.getElementById('imageInput').files[0];
 
-      if (!prompt || !imageInput) {
-        alert('Please enter a prompt and select an image.');
+      if (!prompt || !style || !imageInput) {
+        alert('Please enter a prompt, style, and select an image.');
         return;
       }
 
       const formData = new FormData();
-      formData.append('image', imageInput);
       formData.append('prompt', prompt);
-      
+      formData.append('style', style);
+      formData.append('image', imageInput);
+
       fetch('https://designhand-backend.onrender.com/get_openai_answer', {
         method: 'POST',
         body: formData,
@@ -71,13 +84,17 @@
       })
       .then(response => response.json())
       .then(data => {
-        const suggestionsDiv = document.getElementById('suggestions');
-        suggestionsDiv.innerHTML = '<h3>Suggestions:</h3>';
-        data.suggestions.forEach(suggestion => {
-          const p = document.createElement('p');
-          p.textContent = suggestion;
-          suggestionsDiv.appendChild(p);
-        });
+        const leftDiv = document.getElementById('left');
+        leftDiv.innerHTML = '<h1>Suggestions:</h1>';
+        const suggestionsDiv = document.getElementById('right');
+        const p = document.createElement('p');
+        p.textContent = data.suggestion;
+        suggestionsDiv.appendChild(p);
+        document.getElementById('promptGroup').style.display = 'none';
+        document.getElementById('styleGroup').style.display = 'none';
+        document.getElementById('uploadButton').style.display = 'none';
+        document.getElementById('submitButton').style.display = 'none';
+        document.getElementById('pid_hide').style.display = 'none';
       })
       .catch(error => {
         console.error('Error:', error);
