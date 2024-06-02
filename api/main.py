@@ -2,7 +2,8 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from pydantic import BaseModel
 from typing import Annotated
 import base64
-from fastapi.cors.middleware import CORSMiddleware
+# import cors 
+from fastapi.middleware.cors import CORSMiddleware
 
 from utils import get_openai_suggestion
 
